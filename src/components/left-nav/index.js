@@ -24,11 +24,9 @@ class LeftNav extends Component {
         );
       } else {
         // debugger;
-        const cItem = item.children.find((cItem) => cItem.key === path);
-        console.log(cItem);
+        const cItem = item.children.find((cItem) => path.indexOf(cItem.key) === 0);
         if (cItem) {
           this.openKey = item.key;
-          console.log(this.openKey);
         }
         return (
           <SubMenu
@@ -50,10 +48,13 @@ class LeftNav extends Component {
   }
   render() {
     // debugger;
-    const path = this.props.location.pathname;
-    console.log("render", path);
+    let path = this.props.location.pathname;
+
+    if (path.indexOf("/product") === 0) {
+      // 当前请求的是商品或其子路由界面
+      path = "/product";
+    }
     const openKey = this.openKey;
-    console.log(openKey);
     return (
       <div className="left-nav">
         <Link to="/" className="left-nav-header">

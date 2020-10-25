@@ -1,4 +1,6 @@
 import ajax from "./ajax";
+import { message } from "antd";
+import jsonp from "jsonp";
 
 // const BASE = "http://localhost:5000";
 const BASE = "";
@@ -7,54 +9,57 @@ export const reqLogin = (username, password) => ajax(BASE + "/login", { username
 
 export const reqAddUser = (user) => ajax(BASE + "/manage/user/add", user, "POST");
 
-// export const reqWether = () => {
-//   var lat;
-//   var long;
+/* get categorys/subCategorys */
+export const reqCategorys = (parentId) => ajax(BASE + "/manage/category/list", { parentId });
 
-//   if (navigator.geolocation) {
-//     navigator.geolocation.getCurrentPosition(function (position) {
-//       lat = position.coords.latitude;
-//       long = position.coords.longitude;
+export const reqCategory = (categoryId) => ajax(BASE + "/manage/category/info", { categoryId });
 
-//       var api = "https://fcc-weather-api.glitch.me/api/current?lat=" + lat + "&lon=" + long + "";
-//       // var api = `https://api.darksky.net/forecast/f29f5e6f825425a730343d5a0e9050de/${lat},${long}`;
+/* add category */
+export const reqAddCategory = ({ parentId, categoryName }) => ajax(BASE + "/manage/category/add", { parentId, categoryName }, "POST");
 
-//       $.getJSON(api, function (res) {
-//         var celsius = res.main.temp;
-//         var farenheit = celsius * 1.8 + 32;
-//         var location = res.name;
+/* update category */
+export const reqUpdateCategory = ({ categoryId, categoryName }) => ajax(BASE + "/manage/category/update", { categoryId, categoryName }, "POST");
 
-//         $(".weather-location").html(location);
-//         $(".temp").html(Math.floor(celsius));
-//         $(".weather-description").html(res.weather[0].description);
-//         $(".weatherType").attr("id", res.weather[0].main);
-//         $(".row2").on("click", function () {
-//           if ($(".temp").html() == Math.floor(celsius)) {
-//             $(".temp").html(Math.floor(farenheit));
-//             $(".temp-type").html("°F");
-//           } else {
-//             $(".temp").html(Math.floor(celsius));
-//             $(".temp-type").html("°C");
-//           }
-//         });
+export const reqProducts = (pageNum, pageSize) => ajax(BASE + "/manage/product/list", { pageNum, pageSize });
 
-//         //SETTING UP THE ICON
-//         var icons = new Skycons({
-//           color: "white",
-//         });
+export const reqSearchProducts = (pageNum, pageSize, searchName, searchType) => ajax(BASE + "manage/product/search", { pageNum, pageSize, [searchType]: searchName });
 
-//         icons.set("Clear-day", Skycons.CLEAR_DAY);
-//         icons.set("Clear-night", Skycons.CLEAR_NIGHT);
-//         icons.set("Partly-cloudy-day", Skycons.PARTLY_CLOUDY_DAY);
-//         icons.set("Partly-cloudy-night", Skycons.PARTLY_CLOUDY_NIGHT);
-//         icons.set("Clouds", Skycons.CLOUDY);
-//         icons.set("Rain", Skycons.RAIN);
-//         icons.set("Sleet", Skycons.SLEET);
-//         icons.set("Snow", Skycons.SNOW);
-//         icons.set("Wind", Skycons.WIND);
-//         icons.set("Fog", Skycons.FOG);
-//         icons.play();
-//       });
-//     });
-//   }
-// };
+export const reqUpdateStatus = (productId, status) => ajax(BASE + "/manage/product/updateStatus", { productId, status }, "POST");
+
+export const reqAddOrUpdateProduct = (product) => ajax(BASE + "/manage/product/" + (product._id ? "update" : "add"), product, "POST");
+
+// 删除指定名称的图片
+export const reqDeleteImg = (name) => ajax(BASE + "/manage/img/delete", { name }, "POST");
+
+// 获取所有角色的列表
+export const reqRoles = () => ajax(BASE + "/manage/role/list");
+// 添加角色
+export const reqAddRole = (roleName) => ajax(BASE + "/manage/role/add", { roleName }, "POST");
+// 添加角色
+export const reqUpdateRole = (role) => ajax(BASE + "/manage/role/update", role, "POST");
+
+// 获取所有用户的列表
+export const reqUsers = () => ajax(BASE + "/manage/user/list");
+// 删除指定用户
+export const reqDeleteUser = (userId) => ajax(BASE + "/manage/user/delete", { userId }, "POST");
+// 添加/更新用户
+export const reqAddOrUpdateUser = (user) => ajax(BASE + "/manage/user/" + (user._id ? "update" : "add"), user, "POST");
+
+export const reqWeather = (city) => {
+  return new Promise((resolve, reject) => {
+    const url = `http://api.map.baidu.com/telematics/v3/weather?location=${city}&output=json&ak=3p49MVra6urFRGOT9s8UBWr2`;
+    // 发送jsonp请求
+    jsonp(url, {}, (err, data) => {
+      // console.log("jsonp()", err, data);
+      // 如果成功了
+      if (!err && data.status === "success") {
+        // 取出需要的数据
+        const { dayPictureUrl, weather } = data.results[0].weather_data[0];
+        resolve({ dayPictureUrl, weather });
+      } else {
+        // 如果失败了
+        message.error("获取天气信息失败!");
+      }
+    });
+  });
+};
