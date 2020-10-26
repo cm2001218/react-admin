@@ -15,7 +15,11 @@ import Pie from "../charts/pie";
 
 const { Footer, Sider, Content } = Layout;
 const a = 1;
+<<<<<<< HEAD
 const b = 2;
+=======
+const b = 3;
+>>>>>>> auth
 export default class Admin extends Component {
   render() {
     const user = memoryUtils.user;
